@@ -45,12 +45,21 @@ modules:
         commit: ac84d444b278d5682413f7200dd324ee6c564a01
     make-install-args:
       - "INSTALL_ROOT=/app/qmltermwidget"
+  - name: ChartJs2QML
+    buildsystem: simple
+    sources:
+      - type: git
+        url: https://github.com/kalaksi/ChartJs2QML
+        commit: 2a7720e51f42ed96d48be1f24632e76e2a2889ab
+        dest: 'ChartJs2QML'
+    build-commands:
+      - cp -a ChartJs2QML /app/ChartJs2QML
   - name: lightkeeper
     buildsystem: simple
     sources:
       - type: archive
-        url: https://github.com/kalaksi/lightkeeper/archive/refs/tags/v0.28.4.tar.gz
-        sha256: 1720e5a23dc45f3a9cdd48e0686947819e487cbb45fb16ffc8ea00b28402c79e
+        url: https://github.com/kalaksi/lightkeeper/archive/refs/tags/v0.29.1.tar.gz
+        sha256: db27e5b0c9381e5cb5a00cdba210e2a923308d92a89242f8aedfdad0f2450008
       - "cargo-sources.json"
     build-options:
       append-path: /usr/lib/sdk/rust-stable/bin
