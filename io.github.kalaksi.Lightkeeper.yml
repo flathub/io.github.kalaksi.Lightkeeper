@@ -15,7 +15,9 @@ finish-args:
   - "--share=network"
   - "--device=dri"
   - "--socket=ssh-auth"
+  - "--talk-name=org.freedesktop.secrets"
   - "--talk-name=org.kde.StatusNotifierWatcher"
+  - "--env=SSH_ASKPASS=/app/bin/ksshaskpass"
   - "--env=QTWEBENGINEPROCESS_PATH=/app/bin/QtWebEngineProcess"
 cleanup:
   - /include
@@ -84,12 +86,29 @@ modules:
         && git sparse-checkout set LICENSE src-min-noconflict
         && cd ../../../..
       - cp -a qml-lighthouse-components /app/qml-lighthouse-components
+  - name: qt6keychain
+    buildsystem: cmake-ninja
+    build-options:
+      config-opts:
+        - "-DBUILD_WITH_QT6=ON"
+    sources:
+      - type: git
+        url: https://github.com/frankosterfeld/qtkeychain.git
+        # 0.15.0
+        commit: ad7344c45a86a4f66cbafc4b081b5f7b876cb0b7
+  - name: ksshaskpass
+    buildsystem: cmake-ninja
+    sources:
+      - type: git
+        url: https://invent.kde.org/plasma/ksshaskpass.git
+        # Plasma/6.6
+        commit: 67c43fee0d003e085b34fdeada468a0a5c8cf92e
   - name: lightkeeper
     buildsystem: simple
     sources:
       - type: archive
-        url: https://github.com/kalaksi/lightkeeper/archive/refs/tags/v0.35.3.tar.gz
-        sha256: 7d00e4f28eeb70216333a4cf748739cbc94ec3fbbce3711af32af323f23771d2
+        url: https://github.com/kalaksi/lightkeeper/archive/refs/tags/v0.36.1.tar.gz
+        sha256: 5c77f8e7b5e6d6a745ab05682e593540e656f0852ad4e7f5d9a0795c4deb998a
       - "cargo-sources.json"
     build-options:
       append-path: /usr/lib/sdk/rust-stable/bin
