@@ -15,7 +15,6 @@ finish-args:
   - "--share=network"
   - "--device=dri"
   - "--socket=ssh-auth"
-  - "--talk-name=org.freedesktop.secrets"
   - "--talk-name=org.kde.StatusNotifierWatcher"
   - "--env=SSH_ASKPASS=/app/bin/ksshaskpass"
   - "--env=QTWEBENGINEPROCESS_PATH=/app/bin/QtWebEngineProcess"
@@ -31,28 +30,6 @@ cleanup:
 cleanup-commands:
     - /app/cleanup-BaseApp.sh
 modules:
-  # Liboping is needed for oping monitoring module.
-  - name: liboping
-    buildsystem: autotools
-    build-options:
-      config-opts:
-        - "--without-perl-bindings"
-    sources:
-      - type: archive
-        url: https://noping.cc/files/liboping-1.10.0.tar.gz
-        sha256: c206b05743d0730814be3115b48abd0b00016677525153c78730da307aba0846
-      # Apparently liboping isn't well maintained upstream, so we need patches from Debian.
-      - type: archive
-        url: https://deb.debian.org/debian/pool/main/libo/liboping/liboping_1.10.0-5.debian.tar.xz
-        sha256: bd2d6bd63d032fb4d5a65ed74467baffea74e902d13fdd8409fba3ede35978a4
-        dest: debian-package
-      - type: shell
-        commands:
-          # Remove one patch that modifies configure.ac to avoid needing aclocal-1.14.
-          - rm debian-package/patches/0002-autoupdate-and-enable-automake-Wall.patch
-          - for patchfile in debian-package/patches/*.patch; do patch -p1 < "$patchfile"; done
-    cleanup:
-      - /app/lib/liboping/share/man
   - name: qmltermwidget
     buildsystem: qmake
     sources:
@@ -107,8 +84,8 @@ modules:
     buildsystem: simple
     sources:
       - type: archive
-        url: https://github.com/kalaksi/lightkeeper/archive/refs/tags/v0.36.2.tar.gz
-        sha256: 5f57212dd3d48a1fcdfad5fc7deb1bbbf372a86702d072cee6242503e77deced
+        url: https://github.com/kalaksi/lightkeeper/archive/refs/tags/v0.37.0.tar.gz
+        sha256: 05a21d2865b3fcb091047f7feea5c979676dde2051868ce05acb3ed43fe7420e
       - "cargo-sources.json"
     build-options:
       append-path: /usr/lib/sdk/rust-stable/bin
@@ -117,7 +94,7 @@ modules:
         CARGO_HOME: /run/build/lightkeeper/cargo
     build-commands:
       - cargo --offline fetch --manifest-path Cargo.toml --verbose
-      - cargo --offline build --release --verbose
+      - cargo --offline build --release --no-default-features --features flatpak --verbose
       - install -Dm755 ./target/release/lightkeeper -t /app/bin
       - install -Dm644 ./flatpak/${FLATPAK_ID}.metainfo.xml -t /app/share/metainfo
       - install -Dm644 ./flatpak/${FLATPAK_ID}.desktop -t /app/share/applications
